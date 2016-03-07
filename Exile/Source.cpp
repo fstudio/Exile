@@ -20,7 +20,6 @@ void OnInitialize(string_t &address)
 }
 
 
-
 int wmain(int argc, wchar_t *argv[])
 {
 	BOOL result=AddGitInstallationLocationToPath();

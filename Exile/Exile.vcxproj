@@ -161,7 +161,9 @@
     <ClInclude Include="GZipStream.h" />
     <ClInclude Include="HTTPServer.h" />
     <ClInclude Include="HTTPSession.h" />
+    <ClInclude Include="ParseCommandline.h" />
     <ClInclude Include="Precompiled.h" />
+    <ClInclude Include="User.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

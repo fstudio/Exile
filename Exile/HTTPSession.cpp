@@ -114,7 +114,6 @@ bool HTTPSession::Execute(const std::wstring &relativePath, int channel) {
   BOOL bSuccess;
   uint8_t buffer[PIPE_BUFFER_SIZE] = {0};
   DWORD dwNumberOfBytesRead;
-
   while (TRUE) {
     bSuccess = ReadFile(hPipeOutputRead, // handle of the read end of our pipe
                         buffer,          // address of buffer that receives data
@@ -135,6 +134,5 @@ bool HTTPSession::Execute(const std::wstring &relativePath, int channel) {
   CloseHandle(hPipeInputWrite);
   response_.set_status_code(status_codes::OK);
   request_.reply(response_);
-
   return true;
 }
