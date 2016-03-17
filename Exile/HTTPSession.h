@@ -43,6 +43,7 @@ public:
 private:
 	http_request &request_;
 	http_response response_;
+	int lastError;
 };
 
 

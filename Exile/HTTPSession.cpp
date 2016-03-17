@@ -71,7 +71,7 @@ bool HTTPSession::Execute(const std::wstring &relativePath, int channel) {
   ZeroMemory(&si, sizeof(si));
   ZeroMemory(&pi, sizeof(pi));
   GetStartupInfoW(&si);
-  si.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
+  si.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;//use hStdInput hStdOutput hStdError
   si.wShowWindow = SW_HIDE;
   si.hStdInput = hPipeInputRead;
   si.hStdOutput = hPipeOutputWrite;
@@ -111,6 +111,7 @@ bool HTTPSession::Execute(const std::wstring &relativePath, int channel) {
 
 	  //FIXME
   }
+  //concurrency::streams::ostream ostream;
   BOOL bSuccess;
   uint8_t buffer[PIPE_BUFFER_SIZE] = {0};
   DWORD dwNumberOfBytesRead;
@@ -124,6 +125,7 @@ bool HTTPSession::Execute(const std::wstring &relativePath, int channel) {
     if (!bSuccess) {
       break;
     }
+	//ostream.write(Concurrency::streams::streambuf<uint8_t>(buffer.), dwNumberOfBytesRead);
 	body.append((char*)buffer, dwNumberOfBytesRead);
   }
   WaitForSingleObject(pi.hProcess, INFINITE);
@@ -134,5 +136,8 @@ bool HTTPSession::Execute(const std::wstring &relativePath, int channel) {
   CloseHandle(hPipeInputWrite);
   response_.set_status_code(status_codes::OK);
   request_.reply(response_);
+  //request_.reply(status_codes::OK).then([](){
+	 // //do some thing
+  //});
   return true;
 }

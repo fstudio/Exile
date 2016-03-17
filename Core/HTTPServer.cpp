@@ -3,6 +3,23 @@
 #include <Http.h>
 #include "HTTPServer.h"
 
+
+/*
+* What's New for Windows Sockets
+* https://msdn.microsoft.com/library/windows/desktop/ms740642(v=vs.85).aspx
+* Registered Input/Output (RIO) API Extensions
+* https://technet.microsoft.com/en-us/library/hh997032.aspx
+* Mswsock.h Mswsock.lib Mswsock.dll Windows 8/ Windows Server 2012 or Later
+* https://msdn.microsoft.com/en-us/library/windows/desktop/hh448841(v=vs.85).aspx
+* RIOCreateCompletionQueue
+* http://www.cnblogs.com/gaochundong/p/csharp_tcp_service_models.html
+*/
+
+/*
+* HTTP2 Allow http.h HTTP_REQUEST_FLAG_HTTP2
+* httpserv.h:1093:// Add the SPDY/3 & HTTP/2.0 Push-Promise support
+*/
+
 HTTPServer::HTTPServer()
 {
 	HTTPAPI_VERSION httpApiVersion = HTTPAPI_VERSION_2;
