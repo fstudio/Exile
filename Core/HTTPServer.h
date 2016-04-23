@@ -45,7 +45,7 @@ class HTTPServer {
 public:
 	HTTPServer();
 	~HTTPServer();
-	ULONG InitializeHTTPServer(LPCWSTR url);
+	ULONG InitializeServer(LPCWSTR url);
 	void DoReceiveRequests();
 private:
 	HANDLE hRequestQueue = NULL;
@@ -53,6 +53,7 @@ private:
 	HTTP_URL_GROUP_ID m_urlGroupId = HTTP_NULL_ID;
 	HTTP_BINDING_INFO BindingProperty;
 	HTTP_TIMEOUT_LIMIT_INFO CGTimeout;
+	RIO_EXTENSION_FUNCTION_TABLE rio;
 	PTP_IO m_threadpool_io= NULL;
 };
 

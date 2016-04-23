@@ -6,12 +6,12 @@
 #include <string>
 
 struct AuthorizedInfo {
-	std::string user;
-	std::string pwd;
-	void *data;
+  std::string user;
+  std::string pwd;
+  void *data;
 };
 
-typedef bool(*AuthorizedImpl)(AuthorizedInfo *ai);
+typedef bool (*AuthorizedImpl)(AuthorizedInfo *ai);
 
 BOOL AuthorizedWithBasic(const std::wstring &context);
 

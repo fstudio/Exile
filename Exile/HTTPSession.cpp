@@ -1,7 +1,12 @@
 //
 #include "Precompiled.h"
-#include "HTTPSession.h"
+#include <PathCch.h>
+#include <array>
+///
 #include "GZipStream.h"
+#include "HTTPSession.h"
+
+
 
 static BOOL GitRepositoryAccessCheck(const std::wstring &path) {
   WIN32_FILE_ATTRIBUTE_DATA attr_data;
@@ -14,8 +19,9 @@ static BOOL GitRepositoryAccessCheck(const std::wstring &path) {
 
 bool HTTPSession::Execute(const std::wstring &relativePath, int channel) {
   const CHAR *context_type = nullptr;
-  WCHAR cmdline[MAX_UNC_PATH] = L"git ";
-  //concurrency::streams::streambuf<uint8_t> respbuf;
+  std::vector<wchar_t> cmdx(PATHCCH_MAX_CCH);
+  WCHAR cmdline[PATHCCH_MAX_CCH] = L"git ";
+  // concurrency::streams::streambuf<uint8_t> respbuf;
   utf8string body;
   auto &header = response_.headers();
   header.add(L"Expires", L"Fri, 01 Jan 1980 00:00:00 GMT");
@@ -27,7 +33,7 @@ bool HTTPSession::Execute(const std::wstring &relativePath, int channel) {
   case kGitUploadPackLs:
     wcscat_s(cmdline, L" upload-pack --stateless-rpc --advertise-refs .");
     context_type = "application/x-git-upload-pack-advertisement";
-	body.append((char*)uploadpack_header, sizeof(uploadpack_header) - 1);
+    body.append((char *)uploadpack_header, sizeof(uploadpack_header) - 1);
     break;
   case kGitUploadPackStream:
     wcscat_s(cmdline, L" upload-pack --stateless-rpc .");
@@ -36,7 +42,7 @@ bool HTTPSession::Execute(const std::wstring &relativePath, int channel) {
   case kGitReceivePackLs:
     wcscat_s(cmdline, L" receive-pack --stateless-rpc --advertise-refs .");
     context_type = "application/x-git-receive-pack-advertisement";
-	body.append((char*)receivepack_header, sizeof(receivepack_header) - 1);
+    body.append((char *)receivepack_header, sizeof(receivepack_header) - 1);
     break;
   case kGitReceivePackStream:
     wcscat_s(cmdline, L" receive-pack --stateless-rpc .");
@@ -62,23 +68,22 @@ bool HTTPSession::Execute(const std::wstring &relativePath, int channel) {
   sa.nLength = sizeof(SECURITY_ATTRIBUTES);
   sa.lpSecurityDescriptor = NULL;
   sa.bInheritHandle = TRUE;
-  CreatePipe(&hPipeOutputRead, &hPipeOutputWrite, &sa,
-             PIPE_BUFFER_SIZE);
-  CreatePipe(&hPipeInputRead, &hPipeInputWrite, &sa,
-             PIPE_BUFFER_SIZE);
+  CreatePipe(&hPipeOutputRead, &hPipeOutputWrite, &sa, PIPE_BUFFER_SIZE);
+  CreatePipe(&hPipeInputRead, &hPipeInputWrite, &sa, PIPE_BUFFER_SIZE);
   STARTUPINFOW si;
   PROCESS_INFORMATION pi;
   ZeroMemory(&si, sizeof(si));
   ZeroMemory(&pi, sizeof(pi));
   GetStartupInfoW(&si);
-  si.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;//use hStdInput hStdOutput hStdError
+  si.dwFlags = STARTF_USESHOWWINDOW |
+               STARTF_USESTDHANDLES; // use hStdInput hStdOutput hStdError
   si.wShowWindow = SW_HIDE;
   si.hStdInput = hPipeInputRead;
   si.hStdOutput = hPipeOutputWrite;
   si.hStdError = hPipeOutputWrite;
   /// CreateProcess bInheritHandles require TRUE
-  if (!CreateProcessW(NULL, cmdline, NULL, NULL, TRUE, 0, NULL, repopath.c_str(), &si,
-                      &pi)) {
+  if (!CreateProcessW(NULL, cmdline, NULL, NULL, TRUE, 0, NULL,
+                      repopath.c_str(), &si, &pi)) {
     CloseHandle(hPipeOutputRead);
     CloseHandle(hPipeInputWrite);
     CloseHandle(hPipeOutputWrite);
@@ -90,28 +95,34 @@ bool HTTPSession::Execute(const std::wstring &relativePath, int channel) {
   CloseHandle(hPipeOutputWrite);
   CloseHandle(hPipeInputRead);
   if (channel == kGitUploadPackStream || channel == kGitReceivePackStream) {
-	  auto &h = request_.headers();
-	  //(L"Content-Encoding", L"gzip")
-	  bool encodingGzip = false;
-	  if (h.has(L"Content-Encoding") && h[L"Content-Encoding"].compare(L"gzip") == 0) {
-		  encodingGzip = true;
-	  }
-	  auto &stream = request_.body();
-	  concurrency::streams::container_buffer<std::string> inStringBuffer;
-	  stream.read_to_end(inStringBuffer).then([inStringBuffer,hPipeInputWrite,encodingGzip](size_t bytesRead){
-		  DWORD dwWrite = 0;
-		  const std::string &buffer = inStringBuffer.collection();
-		  if (encodingGzip) {
-			  GZipStreamWritePipe(hPipeInputWrite, (uint8_t*)buffer.data(), bytesRead);
-		  } else {
-			  WriteFile(hPipeInputWrite, buffer.data(), bytesRead, &dwWrite, NULL);
-		  }
-		  //std::cout.write(inStringBuffer.collection().data(), bytesRead);
-	  }).get();
+    auto &h = request_.headers();
+    //(L"Content-Encoding", L"gzip")
+    bool encodingGzip = false;
+    if (h.has(L"Content-Encoding") &&
+        h[L"Content-Encoding"].compare(L"gzip") == 0) {
+      encodingGzip = true;
+    }
+    auto &stream = request_.body();
+    concurrency::streams::container_buffer<std::string> inStringBuffer;
+    stream.read_to_end(inStringBuffer)
+        .then(
+            [inStringBuffer, hPipeInputWrite, encodingGzip](size_t bytesRead) {
+              DWORD dwWrite = 0;
+              const std::string &buffer = inStringBuffer.collection();
+              if (encodingGzip) {
+                GZipStreamWritePipe(hPipeInputWrite, (uint8_t *)buffer.data(),
+                                    bytesRead);
+              } else {
+                WriteFile(hPipeInputWrite, buffer.data(), bytesRead, &dwWrite,
+                          NULL);
+              }
+              // std::cout.write(inStringBuffer.collection().data(), bytesRead);
+            })
+        .get();
 
-	  //FIXME
+    // FIXME
   }
-  //concurrency::streams::ostream ostream;
+  // concurrency::streams::ostream ostream;
   BOOL bSuccess;
   uint8_t buffer[PIPE_BUFFER_SIZE] = {0};
   DWORD dwNumberOfBytesRead;
@@ -125,8 +136,9 @@ bool HTTPSession::Execute(const std::wstring &relativePath, int channel) {
     if (!bSuccess) {
       break;
     }
-	//ostream.write(Concurrency::streams::streambuf<uint8_t>(buffer.), dwNumberOfBytesRead);
-	body.append((char*)buffer, dwNumberOfBytesRead);
+    // ostream.write(Concurrency::streams::streambuf<uint8_t>(buffer.),
+    // dwNumberOfBytesRead);
+    body.append((char *)buffer, dwNumberOfBytesRead);
   }
   WaitForSingleObject(pi.hProcess, INFINITE);
   response_.set_body(body, context_type);
@@ -136,8 +148,8 @@ bool HTTPSession::Execute(const std::wstring &relativePath, int channel) {
   CloseHandle(hPipeInputWrite);
   response_.set_status_code(status_codes::OK);
   request_.reply(response_);
-  //request_.reply(status_codes::OK).then([](){
-	 // //do some thing
+  // request_.reply(status_codes::OK).then([](){
+  // //do some thing
   //});
   return true;
 }

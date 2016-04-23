@@ -5,7 +5,20 @@
 #define HTTP_SESSION_H
 #include <Http.h>
 #include <memory>
+class HTTPGitSession {
+public:
+	HTTPGitSession()
+	{
 
+	}
+	~HTTPGitSession()
+	{
+		///
+	}
+private:
+	HANDLE hWrite;
+	HANDLE hRead;
+};
 class HTTPSession {
 public:
 	HTTPSession();

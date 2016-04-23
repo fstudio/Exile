@@ -1,6 +1,7 @@
 ///
 #include "Precompiled.h"
 #include <Http.h>
+#include <Mswsock.h>
 #include "HTTPServer.h"
 
 
@@ -19,6 +20,7 @@
 * HTTP2 Allow http.h HTTP_REQUEST_FLAG_HTTP2
 * httpserv.h:1093:// Add the SPDY/3 & HTTP/2.0 Push-Promise support
 */
+
 
 HTTPServer::HTTPServer()
 {
@@ -52,7 +54,7 @@ HTTPServer::~HTTPServer()
 	HttpTerminate(HTTP_INITIALIZE_SERVER, NULL);
 }
 
-ULONG HTTPServer::InitializeHTTPServer(LPCWSTR url)
+ULONG HTTPServer::InitializeServer(LPCWSTR url)
 {
 	auto retCode = HttpCreateServerSession(HTTPAPI_VERSION_2,&m_serverSessionId,0);
 	if (retCode != NO_ERROR) {
@@ -122,6 +124,6 @@ ULONG HTTPServer::InitializeHTTPServer(LPCWSTR url)
 void HTTPServer::DoReceiveRequests()
 {
 	for (;;) {
-
+		//HttpSendHttpResponse
 	}
 }
