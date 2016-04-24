@@ -1,7 +1,7 @@
 ///
 #include "Precompiled.h"
 ///
-#include <signal.h>
+#include <Shlwapi.h>
 ///
 #include <cpprest/json.h>
 //
@@ -27,7 +27,15 @@ void OnInitialize(string_t &address) {
 bool ParseProfileMetadata(const wchar_t *file) {
   std::wstring profile;
   if (file == nullptr) {
-    profile.assign(L"Exile.json");
+    WCHAR buf[MAX_PATH] = {0};
+    if (!GetEnvironmentVariableW(L"AppData", buf, MAX_PATH))
+      return false;
+    wcscat_s(buf, LR"(\Exile\Exile.json)");
+    if (PathFileExistsW(buf)) {
+      profile.assign(buf);
+    } else if (PathFileExistsW(L"Exile.json")) {
+      profile.assign(L"Exile.json");
+    }
   } else {
     profile.assign(file);
   }
