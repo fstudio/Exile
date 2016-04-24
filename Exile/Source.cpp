@@ -57,11 +57,14 @@ bool ParseProfileMetadata(const wchar_t *file) {
 }
 
 void PrintUsage() {
-  printf("Exile Git HTTP Smart Server\n"
-         "Usage: Exile [option]\n"
-         "\t--config\tSet profile path,Default: %%AppData%%/Exile/Exile.json"
-         "\t--help\tPrint usage and exit\n"
-         "\t--version\tPrint version and exit\n");
+  const char *usage =
+      R"(Exile Git HTTP Smart Server
+Usage: Exile [option]
+  --config      Set profile path,Default: %%AppData%%\Exile\Exile.json
+  --help        Print usage and exit
+  --version     Print version and exit
+)";
+  printf(usage);
 }
 
 void PrintVersion() { printf("1.0.0\n"); }
