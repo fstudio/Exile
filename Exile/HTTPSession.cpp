@@ -5,8 +5,9 @@
 ///
 #include "GZipStream.h"
 #include "HTTPSession.h"
+#include "ProfileMetadata.h"
 
-
+extern ProfileMetadata g_profileMetadata;
 
 static BOOL GitRepositoryAccessCheck(const std::wstring &path) {
   WIN32_FILE_ATTRIBUTE_DATA attr_data;
@@ -51,7 +52,7 @@ bool HTTPSession::Execute(const std::wstring &relativePath, int channel) {
   default:
     return false;
   }
-  std::wstring repopath = GetRepositoriesRoot();
+  std::wstring repopath = g_profileMetadata.Root();
   if (repopath.back() == '\\')
     repopath.pop_back();
   repopath.append(relativePath);

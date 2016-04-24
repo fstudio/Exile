@@ -39,6 +39,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Exile.json" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HTTPSession.h">
@@ -56,13 +57,10 @@
     <ClInclude Include="GZipStream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="User.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ParseCommandline.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ProfileMetadata.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

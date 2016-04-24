@@ -154,6 +154,10 @@
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Exile.json">
+      <DeploymentContent>true</DeploymentContent>
+      <FileType>Document</FileType>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -161,10 +165,9 @@
     <ClInclude Include="GZipStream.h" />
     <ClInclude Include="HTTPServer.h" />
     <ClInclude Include="HTTPSession.h" />
-    <ClInclude Include="ParseCommandline.h" />
+    <ClInclude Include="ProfileMetadata.h" />
     <ClInclude Include="Precompiled.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="User.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Exile.rc" />
@@ -195,4 +198,9 @@
     <Error Condition="!Exists('..\packages\zlib.v120.windesktop.msvcstl.dyn.rt-dyn.1.2.8.8\build\native\zlib.v120.windesktop.msvcstl.dyn.rt-dyn.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\zlib.v120.windesktop.msvcstl.dyn.rt-dyn.1.2.8.8\build\native\zlib.v120.windesktop.msvcstl.dyn.rt-dyn.targets'))" />
     <Error Condition="!Exists('..\packages\zlib.v140.windesktop.msvcstl.dyn.rt-dyn.1.2.8.8\build\native\zlib.v140.windesktop.msvcstl.dyn.rt-dyn.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\zlib.v140.windesktop.msvcstl.dyn.rt-dyn.1.2.8.8\build\native\zlib.v140.windesktop.msvcstl.dyn.rt-dyn.targets'))" />
   </Target>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties Exile_1json__JSONSchema="" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>

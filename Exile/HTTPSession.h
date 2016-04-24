@@ -10,7 +10,8 @@
 
 
 #define PIPE_BUFFER_SIZE 4096
-const WCHAR *GetRepositoriesRoot();
+//const WCHAR *GetRepositoriesRoot();
+
 
 using namespace web;
 using namespace http;
