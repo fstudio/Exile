@@ -123,6 +123,9 @@ int wmain(int argc, wchar_t *argv[]) {
   }
 
   //
+  DebugMessage(kInfo, L"Initialize Git Smart Server. \nURL: %s\nRoot: %s\n",
+			   g_profileMetadata.Url().data(),
+			   g_profileMetadata.Root().data());
   OnInitialize(g_profileMetadata.Url());
 
 #ifdef _DEBUG

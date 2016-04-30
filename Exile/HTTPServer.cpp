@@ -71,7 +71,9 @@ void HTTPServer::Get(http_request message) {
     return;
   }
 #endif
+
   auto path = http::uri::decode(message.relative_uri().path());
+  DebugMessage(kInfo, L"OPTIONS:  GET %s\n",message.absolute_uri().to_string().data());
   auto &query = uri::split_query(uri::decode(message.request_uri().query()));
   // std::wstring msg;
   string_t relativePath;
@@ -93,10 +95,12 @@ void HTTPServer::Get(http_request message) {
     return;
   }
   // message.reply(status_codes::OK,msg);
-  PRINT_FUNC
+  
 }
 
-void HTTPServer::Put(http_request message) { PRINT_FUNC }
+void HTTPServer::Put(http_request message) { 
+	DebugMessage(kError, L"PUT Method Not Allow ");
+}
 void HTTPServer::Post(http_request message) {
 #ifndef _DEBUG
   if (!RequestFilter(message)) {
@@ -104,6 +108,7 @@ void HTTPServer::Post(http_request message) {
   }
 #endif
   auto path = http::uri::decode(message.relative_uri().path());
+  DebugMessage(kInfo, L"OPTIONS:  POST %s\n", message.absolute_uri().to_string().data());
   auto end = path.rfind(L'/');
   if (end == path.npos) {
     message.reply(status_codes::BadRequest, L"URL Error !");
@@ -120,7 +125,10 @@ void HTTPServer::Post(http_request message) {
     ///
   }
 
-  PRINT_FUNC
 }
-void HTTPServer::Delete(http_request message) { PRINT_FUNC }
-void HTTPServer::Default(http_request message) { PRINT_FUNC }
+void HTTPServer::Delete(http_request message) {
+	DebugMessage(kError, L"DELETE Method Not Allow\n");
+}
+void HTTPServer::Default(http_request message) { 
+	DebugMessage(kError, L"%s Method Not Allow\n",message.method().data());
+}

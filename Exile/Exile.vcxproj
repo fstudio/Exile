@@ -148,6 +148,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Authorization.cpp" />
+    <ClCompile Include="DebugMessage.cpp" />
     <ClCompile Include="GZipStream.cpp" />
     <ClCompile Include="HTTPServer.cpp" />
     <ClCompile Include="HTTPSession.cpp" />
