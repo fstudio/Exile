@@ -65,8 +65,6 @@ bool HTTPSession::Execute(const std::wstring &relativePath, int channel) {
   HANDLE hPipeOutputWrite = NULL;
   HANDLE hPipeInputRead = NULL;
   HANDLE hPipeInputWrite = NULL;
-  HANDLE hPipeErrorRead = NULL;
-  HANDLE hPipeErrorWrite = NULL;
 
   SECURITY_ATTRIBUTES sa;
   sa.nLength = sizeof(SECURITY_ATTRIBUTES);
