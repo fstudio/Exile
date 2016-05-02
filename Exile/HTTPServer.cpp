@@ -8,8 +8,6 @@
 // http://blogs.msdn.com/b/varunm/archive/2013/04/23/remove-unwanted-http-response-headers.aspx
 // HKLM\SYSTEM\CurrentControlSet\Services\HTTP\Parameters  DisableServerHeader 1
 
-#define PRINT_FUNC printf("Function: " __FUNCTION__ " \n");
-
 HTTPServer::HTTPServer(string_t url) : m_listener(url) {
   m_listener.support(methods::GET,
                      std::bind(&HTTPServer::Get, this, std::placeholders::_1));
@@ -66,12 +64,9 @@ bool RequestFilter(http_request &req) {
 }
 
 void HTTPServer::Get(http_request message) {
-#ifndef _DEBUG
   if (!RequestFilter(message)) {
     return;
   }
-#endif
-
   auto path = http::uri::decode(message.relative_uri().path());
   DebugMessage(kInfo, L"OPTIONS:  GET %s\n",message.absolute_uri().to_string().data());
   auto &query = uri::split_query(uri::decode(message.request_uri().query()));

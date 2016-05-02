@@ -9,14 +9,12 @@
 
 
 
-#define PIPE_BUFFER_SIZE 4096
-//const WCHAR *GetRepositoriesRoot();
+#define PIPE_BUFFER_SIZE 0x2000 /// 8192
 
 
 using namespace web;
 using namespace http;
 using namespace utility;
-// using http listener
 using namespace http::experimental::listener;
 
 enum GitSmartSessionChannel {
@@ -37,10 +35,8 @@ public:
 class HTTPSession {
 public:
   explicit HTTPSession(http_request &request) : request_(request) {
-    //
   }
   bool Execute(const std::wstring &relativePath, int channel);
-
 private:
   http_request &request_;
   http_response response_;

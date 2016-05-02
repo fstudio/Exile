@@ -16,9 +16,7 @@ BOOL AuthorizedWithBasic(const std::wstring &context) {
   if (context.size() < 8)
     return FALSE;
   BOOL result = FALSE;
-  DWORD dwSize = 0;
-  DWORD dwSkipChars = 0;
-  DWORD dwActualFormat = 0;
+  DWORD dwSize = 0, dwSkipChars, dwActualFormat;
   std::string user, pwd;
   auto ptr = context.c_str();
   auto size = context.size();
@@ -39,9 +37,6 @@ BOOL AuthorizedWithBasic(const std::wstring &context) {
       result = TRUE;
     }
     LocalFree(pbContent);
-  }
-  if (result) {
-    printf("User: %s  Password: %s \n", user.c_str(), pwd.c_str());
   }
   return result;
 }

@@ -9,6 +9,7 @@
 
 extern ProfileMetadata g_profileMetadata;
 
+
 static BOOL GitRepositoryAccessCheck(const std::wstring &path) {
   WIN32_FILE_ATTRIBUTE_DATA attr_data;
   if (GetFileAttributesExW(path.c_str(), GetFileExInfoStandard, &attr_data)) {
@@ -20,10 +21,10 @@ static BOOL GitRepositoryAccessCheck(const std::wstring &path) {
 
 bool HTTPSession::Execute(const std::wstring &relativePath, int channel) {
   const CHAR *context_type = nullptr;
-  std::vector<wchar_t> cmdx(PATHCCH_MAX_CCH);
   WCHAR cmdline[PATHCCH_MAX_CCH] = L"git ";
-  // concurrency::streams::streambuf<uint8_t> respbuf;
+
   utf8string body;
+
   auto &header = response_.headers();
   header.add(L"Expires", L"Fri, 01 Jan 1980 00:00:00 GMT");
   header.add(L"Pragma", L"no-cache");
@@ -64,6 +65,8 @@ bool HTTPSession::Execute(const std::wstring &relativePath, int channel) {
   HANDLE hPipeOutputWrite = NULL;
   HANDLE hPipeInputRead = NULL;
   HANDLE hPipeInputWrite = NULL;
+  HANDLE hPipeErrorRead = NULL;
+  HANDLE hPipeErrorWrite = NULL;
 
   SECURITY_ATTRIBUTES sa;
   sa.nLength = sizeof(SECURITY_ATTRIBUTES);
@@ -137,20 +140,14 @@ bool HTTPSession::Execute(const std::wstring &relativePath, int channel) {
     if (!bSuccess) {
       break;
     }
-    // ostream.write(Concurrency::streams::streambuf<uint8_t>(buffer.),
-    // dwNumberOfBytesRead);
     body.append((char *)buffer, dwNumberOfBytesRead);
   }
   WaitForSingleObject(pi.hProcess, INFINITE);
   response_.set_body(body, context_type);
-  // Close all remaining handles
   CloseHandle(pi.hProcess);
   CloseHandle(hPipeOutputRead);
   CloseHandle(hPipeInputWrite);
   response_.set_status_code(status_codes::OK);
   request_.reply(response_);
-  // request_.reply(status_codes::OK).then([](){
-  // //do some thing
-  //});
   return true;
 }
