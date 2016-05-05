@@ -1,6 +1,7 @@
 ///
 #include "Precompiled.h"
 #include <Http.h>
+#include <httpserv.h>
 #include <Mswsock.h>
 #include "HTTPServer.h"
 
@@ -21,6 +22,27 @@
 * httpserv.h:1093:// Add the SPDY/3 & HTTP/2.0 Push-Promise support
 */
 
+#define INITIALIZE_HTTP_RESPONSE( resp, status, reason )                    \
+    do                                                                      \
+	    {                                                                       \
+        RtlZeroMemory( (resp), sizeof(*(resp)) );                           \
+        (resp)->StatusCode = (status);                                      \
+        (resp)->pReason = (reason);                                         \
+        (resp)->ReasonLength = (USHORT) strlen(reason);                     \
+	    } while (FALSE)
+
+
+
+#define ADD_KNOWN_HEADER(Response, HeaderId, RawValue)                      \
+    do                                                                      \
+	    {                                                                       \
+        (Response).Headers.KnownHeaders[(HeaderId)].pRawValue = (RawValue); \
+        (Response).Headers.KnownHeaders[(HeaderId)].RawValueLength =        \
+            (USHORT) strlen(RawValue);                                      \
+	    } while(FALSE)
+
+#define ALLOC_MEM(cb) HeapAlloc(GetProcessHeap(), 0, (cb))
+#define FREE_MEM(ptr) HeapFree(GetProcessHeap(), 0, (ptr))
 
 HTTPServer::HTTPServer()
 {
@@ -121,9 +143,136 @@ ULONG HTTPServer::InitializeServer(LPCWSTR url)
 	}
 	return NO_ERROR;
 }
-void HTTPServer::DoReceiveRequests()
+DWORD HTTPServer::DoReceiveRequests()
 {
-	for (;;) {
-		//HttpSendHttpResponse
+	ULONG              result;
+	HTTP_REQUEST_ID    requestId;
+	DWORD              bytesRead;
+	PHTTP_REQUEST      pRequest;
+	PCHAR              pRequestBuffer;
+	ULONG              RequestBufferLength;
+
+	//
+	// Allocate a 2K buffer. Should be good for most requests, we'll grow
+	// this if required. We also need space for a HTTP_REQUEST structure.
+	//
+	RequestBufferLength = sizeof(HTTP_REQUEST) + 2048;
+	pRequestBuffer = (PCHAR)ALLOC_MEM(RequestBufferLength);
+
+	if (pRequestBuffer == NULL) {
+		return ERROR_NOT_ENOUGH_MEMORY;
 	}
+
+	pRequest = (PHTTP_REQUEST)pRequestBuffer;
+
+	//
+	// Wait for a new request -- This is indicated by a NULL request ID.
+	//
+
+	HTTP_SET_NULL_ID(&requestId);
+
+	for (;;) {
+		RtlZeroMemory(pRequest, RequestBufferLength);
+
+		result = HttpReceiveHttpRequest(
+			hRequestQueue,          // Req Queue
+			requestId,          // Req ID
+			0,                  // Flags
+			pRequest,           // HTTP request buffer
+			RequestBufferLength,// req buffer length
+			&bytesRead,         // bytes received
+			NULL                // LPOVERLAPPED
+			);
+
+		if (NO_ERROR == result) {
+			//
+			// Worked!
+			//
+			switch (pRequest->Verb) {
+				case HttpVerbGET:
+				wprintf(L"Got a GET request for %ws \n",
+						pRequest->CookedUrl.pFullUrl);
+				//result = SendHttpResponse(
+				//	hRequestQueue,
+				//	pRequest,
+				//	200,
+				//	"OK",
+				//	"Hey! You hit the server \r\n"
+				//	);
+				break;
+
+				case HttpVerbPOST:
+
+				wprintf(L"Got a POST request for %ws \n",
+						pRequest->CookedUrl.pFullUrl);
+
+				//result = SendHttpPostResponse(hRequestQueue, pRequest);
+				break;
+
+				default:
+				wprintf(L"Got a unknown request for %ws \n",
+						pRequest->CookedUrl.pFullUrl);
+
+				//result = SendHttpResponse(
+				//	hRequestQueue,
+				//	pRequest,
+				//	503,
+				//	"Not Implemented",
+				//	NULL
+				//	);
+				break;
+			}
+
+			if (result != NO_ERROR) {
+				break;
+			}
+
+			//
+			// Reset the Request ID so that we pick up the next request.
+			//
+			HTTP_SET_NULL_ID(&requestId);
+		} else if (result == ERROR_MORE_DATA) {
+			//
+			// The input buffer was too small to hold the request headers
+			// We have to allocate more buffer & call the API again.
+			//
+			// When we call the API again, we want to pick up the request
+			// that just failed. This is done by passing a RequestID.
+			//
+			// This RequestID is picked from the old buffer.
+			//
+			requestId = pRequest->RequestId;
+
+			//
+			// Free the old buffer and allocate a new one.
+			//
+			RequestBufferLength = bytesRead;
+			FREE_MEM(pRequestBuffer);
+			pRequestBuffer = (PCHAR)ALLOC_MEM(RequestBufferLength);
+
+			if (pRequestBuffer == NULL) {
+				result = ERROR_NOT_ENOUGH_MEMORY;
+				break;
+			}
+
+			pRequest = (PHTTP_REQUEST)pRequestBuffer;
+
+		} else if (ERROR_CONNECTION_INVALID == result &&
+				   !HTTP_IS_NULL_ID(&requestId)) {
+			// The TCP connection got torn down by the peer when we were
+			// trying to pick up a request with more buffer. We'll just move
+			// onto the next request.
+
+			HTTP_SET_NULL_ID(&requestId);
+		} else {
+			break;
+		}
+
+	} // for(;;)
+
+	if (pRequestBuffer) {
+		FREE_MEM(pRequestBuffer);
+	}
+
+	return result;
 }

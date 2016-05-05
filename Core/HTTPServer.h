@@ -8,6 +8,9 @@
 #endif
 #include <functional>
 
+#define HTTP_SERVER_NAME L"Exile.Core/1.0"
+
+
 #define CHUNK_SIZE 64 * 1024
 
 class http_overlapped : public OVERLAPPED {
@@ -46,7 +49,7 @@ public:
 	HTTPServer();
 	~HTTPServer();
 	ULONG InitializeServer(LPCWSTR url);
-	void DoReceiveRequests();
+	DWORD DoReceiveRequests();
 private:
 	HANDLE hRequestQueue = NULL;
 	HTTP_SERVER_SESSION_ID m_serverSessionId = HTTP_NULL_ID;
