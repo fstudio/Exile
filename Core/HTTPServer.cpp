@@ -41,8 +41,13 @@
             (USHORT) strlen(RawValue);                                      \
 	    } while(FALSE)
 
-#define ALLOC_MEM(cb) HeapAlloc(GetProcessHeap(), 0, (cb))
-#define FREE_MEM(ptr) HeapFree(GetProcessHeap(), 0, (ptr))
+template<class T>
+inline T* Allocate(size_t n)
+{
+	return reinterpret_cast<T*>(HeapAlloc(GetProcessHeap(), 0, n*sizeof(T)));
+}
+
+#define MemoryFree(ptr) HeapFree(GetProcessHeap(), 0, (ptr))
 
 HTTPServer::HTTPServer()
 {
@@ -157,7 +162,7 @@ DWORD HTTPServer::DoReceiveRequests()
 	// this if required. We also need space for a HTTP_REQUEST structure.
 	//
 	RequestBufferLength = sizeof(HTTP_REQUEST) + 2048;
-	pRequestBuffer = (PCHAR)ALLOC_MEM(RequestBufferLength);
+	pRequestBuffer = Allocate<CHAR>(RequestBufferLength);
 
 	if (pRequestBuffer == NULL) {
 		return ERROR_NOT_ENOUGH_MEMORY;
@@ -247,8 +252,8 @@ DWORD HTTPServer::DoReceiveRequests()
 			// Free the old buffer and allocate a new one.
 			//
 			RequestBufferLength = bytesRead;
-			FREE_MEM(pRequestBuffer);
-			pRequestBuffer = (PCHAR)ALLOC_MEM(RequestBufferLength);
+			MemoryFree(pRequestBuffer);
+			pRequestBuffer = Allocate<CHAR>(RequestBufferLength);
 
 			if (pRequestBuffer == NULL) {
 				result = ERROR_NOT_ENOUGH_MEMORY;
@@ -271,7 +276,7 @@ DWORD HTTPServer::DoReceiveRequests()
 	} // for(;;)
 
 	if (pRequestBuffer) {
-		FREE_MEM(pRequestBuffer);
+		MemoryFree(pRequestBuffer);
 	}
 
 	return result;

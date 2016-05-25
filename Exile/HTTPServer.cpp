@@ -1,8 +1,10 @@
 //
+#include "Precompiled.h"
+//
 #include "Authorization.h"
 #include "HTTPServer.h"
 #include "HTTPSession.h"
-#include "Precompiled.h"
+
 
 
 // http://blogs.msdn.com/b/varunm/archive/2013/04/23/remove-unwanted-http-response-headers.aspx

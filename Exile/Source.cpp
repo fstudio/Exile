@@ -61,6 +61,9 @@ bool ParseProfileMetadata(const wchar_t *file) {
   } else {
     AppendPathToEnvironment(g_profileMetadata.GitInstall());
   }
+  WCHAR tmp_[MAX_PATH];
+  GetEnvironmentVariableW(L"TEMP", tmp_, MAX_PATH);
+  g_profileMetadata.Temporary().assign(tmp_);
   return true;
 }
 

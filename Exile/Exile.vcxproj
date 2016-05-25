@@ -155,12 +155,17 @@
     <ClCompile Include="Parameters.cpp" />
     <ClCompile Include="Precompiled.cpp" />
     <ClCompile Include="Source.cpp" />
+    <ClCompile Include="StashStream.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Exile.json">
+    <CustomBuild Include="Exile.json">
       <DeploymentContent>true</DeploymentContent>
       <FileType>Document</FileType>
-    </None>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy Exile.json $(TargetDir)Exile.json</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(TargetDir)Exile.json</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy Exile.json $(TargetDir)Exile.json</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(TargetDir)Exile.json</Outputs>
+    </CustomBuild>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

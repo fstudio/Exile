@@ -6,6 +6,7 @@
 #if defined(_WIN32_WINNT_WIN8)&&_WIN32_WINNT >=_WIN32_WINNT_WIN8
 #include <Threadpoolapiset.h >
 #endif
+#include <Mswsock.h>
 #include <functional>
 
 #define HTTP_SERVER_NAME L"Exile.Core/1.0"

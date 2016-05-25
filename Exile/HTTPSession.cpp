@@ -22,9 +22,7 @@ static BOOL GitRepositoryAccessCheck(const std::wstring &path) {
 bool HTTPSession::Execute(const std::wstring &relativePath, int channel) {
   const CHAR *context_type = nullptr;
   WCHAR cmdline[PATHCCH_MAX_CCH] = L"git ";
-
   utf8string body;
-
   auto &header = response_.headers();
   header.add(L"Expires", L"Fri, 01 Jan 1980 00:00:00 GMT");
   header.add(L"Pragma", L"no-cache");

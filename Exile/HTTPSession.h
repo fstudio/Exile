@@ -11,6 +11,8 @@
 
 #define PIPE_BUFFER_SIZE 0x2000 /// 8192
 
+#define COMMAND_UPLOAD_PACK 0
+#define COMMAND_RECEIVE_PACK 1
 
 using namespace web;
 using namespace http;
