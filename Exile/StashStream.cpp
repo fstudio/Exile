@@ -7,9 +7,9 @@
 #include <memory>
 #include "HTTPServer.h"
 #include "HTTPSession.h"
-#include "ProfileMetadata.h"
+#include "ExileSettings.h"
 
-extern ProfileMetadata g_profileMetadata;
+extern ExileSettings exileSettings;
 
 static BOOL RepositoryIsExists(const std::wstring &path)
 {
@@ -23,7 +23,7 @@ static BOOL RepositoryIsExists(const std::wstring &path)
 
 static void ResolveRepositoryPath(std::wstring &repopath, const std::wstring &relativePath)
 {
-	repopath.assign(g_profileMetadata.Root());
+	repopath.assign(exileSettings.Root());
 	if (repopath.back() == '\\')
 		repopath.pop_back();
 	repopath.append(relativePath);
@@ -114,7 +114,7 @@ int HTTPFetchActive(http_request &message, const std::wstring &relativePath)
 {
 	/// INN git stdin small stdout big
 	WCHAR file_[MAX_PATH];
-	wsprintfW(file_, L"%s\\Exile.Temporary.Fetch.%d.packs", g_profileMetadata.Temporary(), GetCurrentThreadId());
+	wsprintfW(file_, L"%s\\Exile.Temporary.Fetch.%d.packs", exileSettings.Temporary(), GetCurrentThreadId());
 	return 0;
 }
 
@@ -122,6 +122,6 @@ int HTTPPushActive(http_request &message, const std::wstring &relativePath)
 {
 	// git stdin big stdout small
 	WCHAR file_[MAX_PATH];
-	wsprintfW(file_, L"%s\\Exile.Temporary.Push.%d.packs", g_profileMetadata.Temporary(), GetCurrentThreadId());
+	wsprintfW(file_, L"%s\\Exile.Temporary.Push.%d.packs", exileSettings.Temporary(), GetCurrentThreadId());
 	return 0;
 }

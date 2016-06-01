@@ -6,7 +6,7 @@
 #include <cpprest/json.h>
 //
 #include "HTTPServer.h"
-#include "ProfileMetadata.h"
+#include "ExileSettings.h"
 
 enum ParseCommandLineState {
   kParseContinue = 0,
@@ -16,7 +16,7 @@ enum ParseCommandLineState {
 };
 
 std::unique_ptr<HTTPServer> g_HTTPServer;
-ProfileMetadata g_profileMetadata;
+ExileSettings exileSettings;
 
 void OnShutdown() { g_HTTPServer->close().wait(); }
 void OnInitialize(string_t &address) {
@@ -48,22 +48,22 @@ bool ParseProfileMetadata(const wchar_t *file) {
     return false;
   }
   if (obj.has_field(L"install")) {
-    g_profileMetadata.GitInstall() = obj.at(L"install").as_string();
+    exileSettings.GitInstall() = obj.at(L"install").as_string();
   }
   if (obj.has_field(L"root")) {
-    g_profileMetadata.Root() = obj.at(L"root").as_string();
+    exileSettings.Root() = obj.at(L"root").as_string();
   }
   if (obj.has_field(L"url")) {
-    g_profileMetadata.Url() = obj.at(L"url").as_string();
+    exileSettings.Url() = obj.at(L"url").as_string();
   }
-  if (g_profileMetadata.GitInstall().empty()) {
+  if (exileSettings.GitInstall().empty()) {
     BOOL result = AddGitInstallationLocationToPath();
   } else {
-    AppendPathToEnvironment(g_profileMetadata.GitInstall());
+    AppendPathToEnvironment(exileSettings.GitInstall());
   }
   WCHAR tmp_[MAX_PATH];
   GetEnvironmentVariableW(L"TEMP", tmp_, MAX_PATH);
-  g_profileMetadata.Temporary().assign(tmp_);
+  exileSettings.Temporary().assign(tmp_);
   return true;
 }
 
@@ -127,9 +127,9 @@ int wmain(int argc, wchar_t *argv[]) {
 
   //
   DebugMessage(kInfo, L"Initialize Git Smart Server. \nURL: %s\nRoot: %s\n",
-			   g_profileMetadata.Url().data(),
-			   g_profileMetadata.Root().data());
-  OnInitialize(g_profileMetadata.Url());
+			   exileSettings.Url().data(),
+			   exileSettings.Root().data());
+  OnInitialize(exileSettings.Url());
 
 #ifdef _DEBUG
   std::cout << "Press ENTER to exit." << std::endl;

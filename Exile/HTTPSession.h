@@ -19,6 +19,14 @@ using namespace http;
 using namespace utility;
 using namespace http::experimental::listener;
 
+
+struct ExileContext {
+	http_request &request;
+	std::wstring service;
+	std::wstring relative;
+};
+
+
 enum GitSmartSessionChannel {
   kGitUploadPackLs,
   kGitUploadPackStream,
@@ -26,13 +34,14 @@ enum GitSmartSessionChannel {
   kGitReceivePackStream
 };
 
-class GitSmartSession {
+
+
+class ExileSession {
 public:
-  GitSmartSession();
+	ExileSession();
+	bool Discover(ExileContext &context);
+	bool Packfile(ExileContext &context);
 };
-/*
-* git upload-pack
-*/
 
 class HTTPSession {
 public:

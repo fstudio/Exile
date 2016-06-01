@@ -42,6 +42,7 @@ bool RequestFilter(http_request &req) {
   auto ua = m_header[L"User-Agent"];
   if (ua.compare(0, 4, L"git/") != 0 && ua.compare(0, 5, L"JGIT/") != 0) {
     req.reply(status_codes::Forbidden, L"Access Forbidden");
+	return false;
   }
 #endif
   http::http_response resp;
@@ -50,7 +51,7 @@ bool RequestFilter(http_request &req) {
     if (AuthorizedWithBasic(base64text)) {
       return true;
     }
-    resp.set_body(L"Disable");
+    resp.set_body(L"Forbidden");
     resp.set_status_code(status_codes::Forbidden);
     req.reply(resp);
     return false;

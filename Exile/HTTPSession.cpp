@@ -5,9 +5,9 @@
 ///
 #include "GZipStream.h"
 #include "HTTPSession.h"
-#include "ProfileMetadata.h"
+#include "ExileSettings.h"
 
-extern ProfileMetadata g_profileMetadata;
+extern ExileSettings exileSettings;
 
 
 static BOOL GitRepositoryAccessCheck(const std::wstring &path) {
@@ -51,7 +51,7 @@ bool HTTPSession::Execute(const std::wstring &relativePath, int channel) {
   default:
     return false;
   }
-  std::wstring repopath = g_profileMetadata.Root();
+  std::wstring repopath = exileSettings.Root();
   if (repopath.back() == '\\')
     repopath.pop_back();
   repopath.append(relativePath);
@@ -122,7 +122,8 @@ bool HTTPSession::Execute(const std::wstring &relativePath, int channel) {
 
     // FIXME
   }
-  // concurrency::streams::ostream ostream;
+  //concurrency::streams::ostream ostream;
+
   BOOL bSuccess;
   uint8_t buffer[PIPE_BUFFER_SIZE] = {0};
   DWORD dwNumberOfBytesRead;
@@ -136,6 +137,7 @@ bool HTTPSession::Execute(const std::wstring &relativePath, int channel) {
     if (!bSuccess) {
       break;
     }
+	
     body.append((char *)buffer, dwNumberOfBytesRead);
   }
   WaitForSingleObject(pi.hProcess, INFINITE);
@@ -147,3 +149,38 @@ bool HTTPSession::Execute(const std::wstring &relativePath, int channel) {
   request_.reply(response_);
   return true;
 }
+
+bool PathCombineExists(const std::wstring &rela, std::wstring &path_)
+{
+	if (rela.empty())
+		return false;
+	std::array<wchar_t, PATHCCH_MAX_CCH> array_;
+	//path_.reserve(PATHCCH_MAX_CCH);
+	HRESULT hr=PathCchCombineEx(&array_[0], PATHCCH_MAX_CCH, exileSettings.Root().c_str(), rela.c_str(), 0);
+	if (hr != S_OK)
+		return false;
+	path_.assign(array_.data());
+	WIN32_FILE_ATTRIBUTE_DATA attr_data;
+	if (GetFileAttributesExW(path_.c_str(), GetFileExInfoStandard, &attr_data)) {
+		if (attr_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+			return true;
+	}
+	return false;
+}
+
+
+bool ExileSession::Discover(ExileContext &context)
+{
+	std::wstring  repodir;
+	if (!PathCombineExists(context.relative, repodir)) {
+		//// DO 
+	}
+
+	return true;
+}
+
+bool ExileSession::Packfile(ExileContext &context)
+{
+	return true;
+}
+

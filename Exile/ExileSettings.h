@@ -6,9 +6,9 @@
 
 #include <string>
 
-class ProfileMetadata {
+class ExileSettings {
 public:
-  ProfileMetadata() {
+  ExileSettings() {
 	  url_ = L"http://localhost:10240";
 	  root_ = LR"(F:\Github)";
   }
