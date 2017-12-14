@@ -1,9 +1,11 @@
-#Exile Project
+# Exile Project
+
+**[Deprecated] Your can use https://github.com/fcharlie/Angelo is cross platfrom, but c++ version need asio** 
 Git HTTP Smart Server on Windows, Base C++
 
 
 
-##Build
+## Build
 
 Build Exile is very simple,please click Exile.sln if your installed Visual Studio Community 2013 or 2015 ,
 
@@ -22,7 +24,7 @@ nuget restore
 msbuild Exile.sln 
 ```
 
-##Plain
+## Plain
 
 - Authoriztaion
 
@@ -31,5 +33,6 @@ msbuild Exile.sln
 - Configurable
 - HTTP.sys Faster model
 
-##Copyright
-Copyright © 2016. ForceStudio. All Rights Reserved.
+## Copyright
+
+Copyright © 2017. ForceStudio. All Rights Reserved.
